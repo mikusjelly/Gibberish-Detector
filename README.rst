@@ -1,42 +1,51 @@
 Overview
 ========
 
-A sample program I wrote to detect gibberish.  It uses a 2 character markov chain.
+This is https://github.com/rrenaud/Gibberish-Detector packaged as a library.
+It is a library to detect gibberish.  It uses a 2 character markov chain.
 
 http://en.wikipedia.org/wiki/Markov_chain
 
-This is a nice (IMO) answer to this guys question on stackoverflow.
+This is a nice answer to this guys question on stackoverflow.
 http://stackoverflow.com/questions/6297991/is-there-any-way-to-detect-strings-like-putjbtghguhjjjanika/6298040#comment-7360747
 
+The library contains a model pre-trained on texts from
+http://norvig.com/spell-correct.html
+(big.txt in this repo, not included in pypi package).
+
 Usage
-=====
+-----
 
-First train the model:
+::
 
-python gib_detect_train.py
+    $ python
+    >>> import gib_detect
+    >>> gib_detect.is_gibberish('my name is rob and i like to hack')
+    False
+    >>> gib_detect.is_gibberish('is this thing working?')
+    False
+    >>> gib_detect.is_gibberish('i hope so')
+    False
+    >>> gib_detect.is_gibberish('t2 chhsdfitoixcv')
+    True
+    >>> gib_detect.is_gibberish('ytjkacvzw')
+    True
+    >>> gib_detect.is_gibberish('yutthasxcvqer')
+    True
+    >>> gib_detect.is_gibberish('seems okay')
+    False
+    >>> gib_detect.is_gibberish('yay!')
+    False
+    >>>
 
-Then try it on some sample input
+Training the model::
 
-python gib_detect.py
+    train_gib_detect big.txt good.txt bad.txt en_model.json
 
-my name is rob and i like to hack True
-
-is this thing working? True
-
-i hope so True
-
-t2 chhsdfitoixcv False
-
-ytjkacvzw False
-
-yutthasxcvqer False
-
-seems okay True
-
-yay! True
 
 How it works
-============
+------------
+
 The markov chain first 'trains' or 'studies' a few MB of English text, recording how often characters appear next to each other. Eg, given the text "Rob likes hacking" it sees Ro, ob, o[space], [space]l, ... It just counts these pairs. After it has finished reading through the training data, it normalizes the counts. Then each character has a probability distribution of 27 followup character (26 letters + space) following the given initial.
 
 So then given a string, it measures the probability of generating that string according to the summary by just multiplying out the probabilities of the adjacent pairs of characters in that string. EG, for that "Rob likes hacking" string, it would compute prob['r']['o'] * prob['o']['b'] * prob['b'][' '] ... This probability then measures the amount of 'surprise' assigned to this string according the data the model observed when training. If there is funny business with the input string, it will pass through some pairs with very low counts in the training phase, and hence have low probability/high surprise.

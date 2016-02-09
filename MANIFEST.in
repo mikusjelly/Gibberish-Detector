@@ -1,0 +1,4 @@
+include README.rst
+include LICENSE
+include en_model.json
+recursive-exclude * *.py[co]
