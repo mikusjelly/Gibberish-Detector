@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gib_detect',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     include_package_data = True,
     license='MIT license',
@@ -14,6 +14,8 @@ setup(
             'train_gib_detect=gib_detect:train_cli',
         ],
     },
+    py_modules=["gib_detect"],
+    data_files=["en_model.json"],
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
